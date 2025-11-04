@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Travel Planner Route</title>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>#map { height: 100vh; }</style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    var map = L.map('map').setView([28.704100,77.102500], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+    L.marker([28.704100,77.102500]).addTo(map).bindPopup('Delhi');
+L.marker([17.385000,78.486700]).addTo(map).bindPopup('Hyderabad');
+
+    L.polyline([[ 28.704100,77.102500 ],[ 17.385000,78.486700 ]], {color:'blue'}).addTo(map);
+
+</script>
+</body>
+</html>
