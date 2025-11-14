@@ -1,4 +1,4 @@
-package in.abhinavsaurabh;
+package in.abhinavsaurabh.routemapper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -12,9 +12,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
-public class TravelPlannerV1 {
-
-    public static void main(String[] args) throws Exception {
+public class TravelPlannerV1
+{
+    public static void main(String[] args) throws Exception
+    {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter Source City: ");
         String source = scanner.nextLine().trim();
@@ -25,7 +26,8 @@ public class TravelPlannerV1 {
         double[] srcCoords = getLatLng(source);
         double[] destCoords = getLatLng(destination);
 
-        if (srcCoords == null || destCoords == null) {
+        if (srcCoords == null || destCoords == null)
+        {
             System.out.println("Unable to find one of the city locations.");
             return;
         }
@@ -33,7 +35,8 @@ public class TravelPlannerV1 {
         // Fetch route from OSRM
         RouteResult routeResult = getRoute(srcCoords, destCoords);
 
-        if (routeResult == null) {
+        if (routeResult == null)
+        {
             System.out.println("No route found.");
             return;
         }
@@ -49,12 +52,14 @@ public class TravelPlannerV1 {
     }
 
     // Helper Class
-    static class RouteResult {
+    static class RouteResult
+    {
         List<double[]> waypoints;
         double distanceKm;
         double durationHrs;
 
-        RouteResult(List<double[]> waypoints, double distanceKm, double durationHrs) {
+        RouteResult(List<double[]> waypoints, double distanceKm, double durationHrs)
+        {
             this.waypoints = waypoints;
             this.distanceKm = distanceKm;
             this.durationHrs = durationHrs;
@@ -62,8 +67,10 @@ public class TravelPlannerV1 {
     }
 
     // Get Latitude & Longitude using OpenStreetMap Nominatim
-    public static double[] getLatLng(String placeName) {
-        try {
+    public static double[] getLatLng(String placeName)
+    {
+        try
+        {
             String encodedPlace = URLEncoder.encode(placeName, "UTF-8");
             String urlStr = "https://nominatim.openstreetmap.org/search?q=" + encodedPlace + "&format=json&limit=1";
             HttpURLConnection conn = (HttpURLConnection) new URL(urlStr).openConnection();
@@ -72,21 +79,28 @@ public class TravelPlannerV1 {
             BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             StringBuilder response = new StringBuilder();
             String line;
-            while ((line = reader.readLine()) != null) response.append(line);
+            while ((line = reader.readLine()) != null)
+            {
+                response.append(line);
+            }
             reader.close();
             JSONArray arr = new JSONArray(response.toString());
             if (arr.length() == 0) return null;
             JSONObject obj = arr.getJSONObject(0);
             return new double[]{obj.getDouble("lat"), obj.getDouble("lon")};
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             System.err.println("Error fetching coordinates for " + placeName + ": " + e.getMessage());
             return null;
         }
     }
 
     // Get Route from OSRM
-    public static RouteResult getRoute(double[] src, double[] dest) {
-        try {
+    public static RouteResult getRoute(double[] src, double[] dest)
+    {
+        try
+        {
             String urlStr = String.format(Locale.US,
                     "https://router.project-osrm.org/route/v1/driving/%f,%f;%f,%f?overview=full&geometries=geojson",
                     src[1], src[0], dest[1], dest[0]);
@@ -97,12 +111,18 @@ public class TravelPlannerV1 {
             BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             StringBuilder response = new StringBuilder();
             String line;
-            while ((line = reader.readLine()) != null) response.append(line);
+            while ((line = reader.readLine()) != null)
+            {
+                response.append(line);
+            }
             reader.close();
 
             JSONObject json = new JSONObject(response.toString());
             JSONArray routes = json.getJSONArray("routes");
-            if (routes.isEmpty()) return null;
+            if (routes.isEmpty())
+            {
+                return null;
+            }
 
             JSONObject route = routes.getJSONObject(0);
             double distanceKm = route.getDouble("distance") / 1000.0;
@@ -110,28 +130,36 @@ public class TravelPlannerV1 {
 
             JSONArray coords = route.getJSONObject("geometry").getJSONArray("coordinates");
             List<double[]> waypoints = new ArrayList<>();
-            for (int i = 0; i < coords.length(); i++) {
+            for (int i = 0; i < coords.length(); i++)
+            {
                 JSONArray pair = coords.getJSONArray(i);
                 waypoints.add(new double[]{pair.getDouble(1), pair.getDouble(0)});
             }
 
             return new RouteResult(waypoints, distanceKm, durationHrs);
 
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             System.err.println("Error fetching route: " + e.getMessage());
             return null;
         }
     }
 
     // Generate Interactive Map
-    public static void generateMapHTML(String source, String destination,
-                                       double[] srcCoords, double[] destCoords, List<double[]> waypoints) throws Exception {
+    public static void generateMapHTML(String source, String destination, double[] srcCoords,
+                                       double[] destCoords, List<double[]> waypoints) throws Exception
+    {
 
         StringBuilder pathLine = new StringBuilder("[");
-        for (double[] wp : waypoints) {
+        for (double[] wp : waypoints)
+        {
             pathLine.append(String.format("[%f,%f],", wp[0], wp[1]));
         }
-        if (pathLine.charAt(pathLine.length() - 1) == ',') pathLine.setLength(pathLine.length() - 1);
+        if (pathLine.charAt(pathLine.length() - 1) == ',')
+        {
+            pathLine.setLength(pathLine.length() - 1);
+        }
         pathLine.append("]");
 
         String html = """

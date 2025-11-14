@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group = 'in.abhinavsaurabh'
+group = 'in.abhinavsaurabh.routemapper'
 version = '1.0-SNAPSHOT'
 
 repositories {
